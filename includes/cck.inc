@@ -108,6 +108,7 @@ function streamingmediafield_widget_info() {
  */
 function streamingmediafield_widget(&$form, &$form_state, $field, $items, $delta = 0) {
   $stream_type = ($field['widget']['stream_type']) ? $field['widget']['stream_type'] : 'choose';
+  $progressive_download_default = ($field['widget']['progressive_download_default']) ? $field['widget']['progressive_download_default'] : FALSE;
 
   $element = array('#tree' => TRUE, '#type' => 'fieldset', '#title' => $field['widget']['label'], '#description' => $field['widget']['description'], '#collapsible' => $field['widget']['collapsible']);
 
@@ -138,7 +139,7 @@ function streamingmediafield_widget(&$form, &$form_state, $field, $items, $delta
         '#type' => 'checkbox',
         '#title' => t('Use progressive download instead of streaming'),
         '#description' => t('If checked, the player will use progressive download technology rather than streaming.'),
-        '#default_value' => $items[$delta]['progressive_download'],
+        '#default_value' => ($form['nid']['#value']) ? $items[$delta]['progressive_download'] : $progressive_download_default,
     );
 
     if (module_exists('ctools')) {
@@ -198,8 +199,15 @@ function streamingmediafield_widget_settings($op, $widget) {
           '#title' => t('Allow user to collapse this field'),
           '#default_value' => isset($widget['collapsible']) ? $widget['collapsible'] : TRUE,
       );
+
+      $form['progressive_download_default'] = array(
+          '#type' => 'checkbox',
+          '#title' => t('Select progressive download by default for on-demand content'),
+          '#default_value' => isset($widget['progressive_download_default']) ? $widget['progressive_download_default'] : FALSE,
+      );
+
       return $form;
     case 'save':
-      return array('stream_type', 'collapsible');
+      return array('stream_type', 'collapsible', 'progressive_download_default');
   }
 }
