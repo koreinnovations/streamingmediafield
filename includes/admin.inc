@@ -46,10 +46,13 @@ function streamingmediafield_admin_settings_form() {
       '#title' => t('Default RTSP On-Demand URL'),
       '#default_value' => variable_get('streamingmediafield_rtsp_ondemand_url', ''),
   );
-  $form['rtsp']['streamingmediafield_progressive_download_url'] = array(
+
+  $form['progressive'] = array('#type' => 'fieldset', '#tree' => FALSE, '#title' => t('Progressive Download'), '#description' => t('An alternative playback method for on-demand content'));
+  $form['progressive']['streamingmediafield_progressive_download_server'] = array(
       '#type' => 'textfield',
-      '#title' => t('Default Progressive Download URL'),
-      '#default_value' => variable_get('streamingmediafield_progressive_download_url', ''),
+      '#title' => t('Default Progressive Download Server'),
+      '#default_value' => variable_get('streamingmediafield_progressive_download_server', ''),
+      '#description' => t('Do not include the http://'),
   );
 
   return system_settings_form($form);

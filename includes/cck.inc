@@ -134,12 +134,20 @@ function streamingmediafield_widget(&$form, &$form_state, $field, $items, $delta
         '#description' => t('The directory on the streaming server where this stream can be found'),
         '#default_value' => $items[$delta]['stream_path'],
     );
+    $element['progressive_download'] = array(
+        '#type' => 'checkbox',
+        '#title' => t('Use progressive download instead of streaming'),
+        '#description' => t('If checked, the player will use progressive download technology rather than streaming.'),
+        '#default_value' => $items[$delta]['progressive_download'],
+    );
 
     if (module_exists('ctools')) {
       $field_key = sprintf('%s[%d][is_live]', $field['field_name'], $delta);
       ctools_include('dependent');
       $element['stream_path']['#process'] = array('ctools_dependent_process');
       $element['stream_path']['#dependency'] = array('radio:' . $field_key => array(0));
+      $element['progressive_download']['#process'] = array('ctools_dependent_process');
+      $element['progressive_download']['#dependency'] = array('radio:' . $field_key => array(0));
     }
   }
 
