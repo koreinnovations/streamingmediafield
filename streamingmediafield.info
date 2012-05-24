@@ -1,0 +1,5 @@
+name = Streaming Media Field
+description = Creates a Streaming Media CCK field type used for live or on-demand streaming
+core = 6.x
+version = 1.1
+dependencies[] = content
