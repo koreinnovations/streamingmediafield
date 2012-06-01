@@ -3,6 +3,7 @@
 /*
  * Implementation of hook_theme().
  */
+
 function streamingmediafield_theme() {
   return array(
       'streaming_media' => array(
@@ -44,22 +45,17 @@ function streamingmediafield_perm() {
  * UNCOMMENT THIS FUNCTION WHEN WE HAVE FINISHED DEVELOPING THE VIEWS HANDLERS.
  */
 /*
-function streamingmediafield_views_api() {
+  function streamingmediafield_views_api() {
   return array(
-    'api' => 2.0,
-    'path' => drupal_get_path('module', 'streamingmediafield') . '/views',
+  'api' => 2.0,
+  'path' => drupal_get_path('module', 'streamingmediafield') . '/views',
   );
-}
+  }
  */
-
-
-
-/* * ***************
- * CCK functions *
- * *************** */
 
 /**
  * Implementation of hook_field_info().
+ * D7
  */
 function streamingmediafield_field_info() {
   return array(
@@ -71,16 +67,77 @@ function streamingmediafield_field_info() {
 }
 
 /**
- * Implementation of hook_formatter_info().
+ * Implementation of hook_field_formatter_info().
+ * D7
  */
 function streamingmediafield_field_formatter_info() {
   return array(
       'default' => array(
           'label' => t('Default'),
           'field types' => array('streaming_media'),
-          'multiple values' => CONTENT_HANDLE_CORE,
       ),
   );
+}
+
+/**
+ * Implementation of hook_field_formatter_view().
+ * D7
+ */
+function streamingmediafield_field_formatter_view($entity_type, $entity, $field, $instance, $langcode, $items, $display) {
+  $element = array();
+
+  switch ($display['type']) {
+    case 'default':
+      foreach ($items as $delta => $item) {
+        $element[$delta]['#markup'] = t('Stream output should go here.  Stream name is !stream', array('!stream' => $item['stream_name']));
+      }
+      break;
+  }
+
+  return $element;
+}
+
+/**
+ * Implementation of hook_field_schema().
+ * D7
+ */
+function streamingmediafield_field_schema() {
+  $columns = array();
+  $columns['stream_name'] = array('type' => 'varchar', 'length' => 255, 'not null' => TRUE);
+  $columns['stream_path'] = array('type' => 'varchar', 'length' => 255, 'not null' => FALSE);
+  $columns['is_live'] = array('type' => 'int', 'size' => 'tiny', 'not null' => TRUE);
+  $columns['progressive_download'] = array('type' => 'int', 'size' => 'tiny', 'not null' => TRUE);
+
+  $indexes = array();
+  $indexes['stream_name'] = array('stream_name');
+
+  return array(
+      'columns' => $columns,
+      'indexes' => $indexes,
+  );
+}
+
+/**
+ * Implementation of hook_field_schema().
+ * D7
+ */
+function streamingmediafield_field_validate($entity_type, $entity, $field, $instance, $langcode, $items, &$errors) {
+  foreach ($items as $delta => $item) {
+    if (empty($item['stream_name'])) {
+      $errors[$field['field_name']][$langcode][$delta][] = array(
+          'error' => 'stream_name_missing',
+          'message' => t('Please fill in the stream name.'),
+      );
+    }
+  }
+}
+
+/**
+ * Implementation of hook_field_is_empty().
+ * D7
+ */
+function streamingmediafield_field_is_empty($item, $field) {
+  return empty($item['stream_name']);
 }
 
 /**
@@ -141,6 +198,7 @@ function streamingmediafield_content_is_empty($item, $field) {
 
 /**
  * Implementation of hook_widget_info().
+ * D7
  */
 function streamingmediafield_widget_info() {
   $info = array();
@@ -148,10 +206,6 @@ function streamingmediafield_widget_info() {
   $info['streaming_media'] = array(
       'label' => t('Streaming media config'),
       'field types' => array('streaming_media'),
-      'multiple values' => CONTENT_HANDLE_CORE,
-      'callbacks' => array(
-          'default value' => CONTENT_CALLBACK_CUSTOM,
-      ),
   );
 
   return $info;
@@ -160,7 +214,7 @@ function streamingmediafield_widget_info() {
 /**
  * Implementation of hook_widget()
  */
-function streamingmediafield_widget(&$form, &$form_state, $field, $items, $delta = 0) {
+function streamingmediafield_widget_form(&$form, &$form_state, $field, $instance, $langcode, $items, $delta, $element) {
   $stream_type = ($field['widget']['stream_type']) ? $field['widget']['stream_type'] : 'choose';
   $progressive_download_default = ($field['widget']['progressive_download_default']) ? $field['widget']['progressive_download_default'] : FALSE;
 
