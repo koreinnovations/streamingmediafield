@@ -2,16 +2,16 @@
 
 /*
  * Implementation of hook_theme().
+ * D7
  */
-
 function streamingmediafield_theme() {
   return array(
       'streaming_media' => array(
-          'arguments' => array('element' => NULL),
+          'variables' => array('element' => NULL),
           'file' => 'includes/theme.inc',
       ),
       'streamingmediafield_formatter_default' => array(
-          'arguments' => array('element' => NULL),
+          'variables' => array('element' => NULL),
           'file' => 'includes/theme.inc',
       ),
   );
@@ -19,39 +19,19 @@ function streamingmediafield_theme() {
 
 /**
  * Implementation of hook_menu().
+ * D7
  */
 function streamingmediafield_menu() {
-  $menu['admin/settings/streamingmediafield'] = array(
+  $menu['admin/config/streamingmediafield'] = array(
       'title' => 'Streaming Media Field',
       'page callback' => 'drupal_get_form',
       'page arguments' => array('streamingmediafield_admin_settings_form'),
-      'access arguments' => array('administer streamingmediafield'),
+      'access arguments' => array('administer site configuration'),
       'file' => 'includes/admin.inc',
   );
 
   return $menu;
 }
-
-/**
- * Implementation of hook_perm().
- */
-function streamingmediafield_perm() {
-  return array('administer streamingmediafield');
-}
-
-/**
- * Implementation of hook_views_api().
- *
- * UNCOMMENT THIS FUNCTION WHEN WE HAVE FINISHED DEVELOPING THE VIEWS HANDLERS.
- */
-/*
-  function streamingmediafield_views_api() {
-  return array(
-  'api' => 2.0,
-  'path' => drupal_get_path('module', 'streamingmediafield') . '/views',
-  );
-  }
- */
 
 /**
  * Implementation of hook_field_info().
@@ -176,7 +156,7 @@ function streamingmediafield_field_settings($op, $field) {
 }
 
 /**
- * Generate a default value for streaming medai fields.
+ * Generate a default value for streaming media fields.
  */
 function streamingmediafield_default_value(&$form, &$form_state, $field, $delta = 0) {
   $default_value = array();
@@ -190,7 +170,8 @@ function streamingmediafield_default_value(&$form, &$form_state, $field, $delta 
 }
 
 /**
- * Implementation of hook_content_is_empty
+ * Implementation of hook_content_is_empty().
+ * D7
  */
 function streamingmediafield_content_is_empty($item, $field) {
   return empty($item['stream_name']);
