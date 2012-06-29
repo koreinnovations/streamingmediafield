@@ -1,38 +1,5 @@
 <?php
 
-/*
- * Implementation of hook_theme().
- * D7
- */
-function streamingmediafield_theme() {
-  return array(
-      'streaming_media' => array(
-          'variables' => array('element' => NULL),
-          'file' => 'includes/theme.inc',
-      ),
-      'streamingmediafield_formatter_default' => array(
-          'variables' => array('element' => NULL),
-          'file' => 'includes/theme.inc',
-      ),
-  );
-}
-
-/**
- * Implementation of hook_menu().
- * D7
- */
-function streamingmediafield_menu() {
-  $menu['admin/config/streamingmediafield'] = array(
-      'title' => 'Streaming Media Field',
-      'page callback' => 'drupal_get_form',
-      'page arguments' => array('streamingmediafield_admin_settings_form'),
-      'access arguments' => array('administer site configuration'),
-      'file' => 'includes/admin.inc',
-  );
-
-  return $menu;
-}
-
 /**
  * Implementation of hook_field_info().
  * D7
@@ -44,37 +11,6 @@ function streamingmediafield_field_info() {
           'description' => t('Live or on-demand streaming media'),
       ),
   );
-}
-
-/**
- * Implementation of hook_field_formatter_info().
- * D7
- */
-function streamingmediafield_field_formatter_info() {
-  return array(
-      'default' => array(
-          'label' => t('Default'),
-          'field types' => array('streaming_media'),
-      ),
-  );
-}
-
-/**
- * Implementation of hook_field_formatter_view().
- * D7
- */
-function streamingmediafield_field_formatter_view($entity_type, $entity, $field, $instance, $langcode, $items, $display) {
-  $element = array();
-
-  switch ($display['type']) {
-    case 'default':
-      foreach ($items as $delta => $item) {
-        $element[$delta]['#markup'] = t('Stream output should go here.  Stream name is !stream', array('!stream' => $item['stream_name']));
-      }
-      break;
-  }
-
-  return $element;
 }
 
 /**
@@ -118,6 +54,92 @@ function streamingmediafield_field_validate($entity_type, $entity, $field, $inst
  */
 function streamingmediafield_field_is_empty($item, $field) {
   return empty($item['stream_name']);
+}
+
+/**
+ * Implementation of hook_field_formatter_info().
+ * D7
+ */
+function streamingmediafield_field_formatter_info() {
+  return array(
+      'default' => array(
+          'label' => t('Default'),
+          'field types' => array('streaming_media'),
+      ),
+  );
+}
+
+/**
+ * Implementation of hook_field_formatter_view().
+ * D7
+ */
+function streamingmediafield_field_formatter_view($entity_type, $entity, $field, $instance, $langcode, $items, $display) {
+  $element = array();
+
+  switch ($display['type']) {
+    case 'default':
+      foreach ($items as $delta => $item) {
+        $element[$delta]['#markup'] = t('Stream output should go here.  Stream name is !stream', array('!stream' => $item['stream_name']));
+      }
+      break;
+  }
+
+  return $element;
+}
+
+/**
+ * Implementation of hook_field_widget_info().
+ * D7
+ */
+function streamingmediafield_field_widget_info() {
+  $info = array();
+
+  $info['streaming_media'] = array(
+      'label' => t('Streaming media config'),
+      'field types' => array('streaming_media'),
+  );
+
+  return $info;
+}
+
+/* * ***************************************************** */
+
+
+
+
+
+/*
+ * Implementation of hook_theme().
+ * D7
+ */
+
+function streamingmediafield_theme() {
+  return array(
+      'streaming_media' => array(
+          'variables' => array('element' => NULL),
+          'file' => 'includes/theme.inc',
+      ),
+      'streamingmediafield_formatter_default' => array(
+          'variables' => array('element' => NULL),
+          'file' => 'includes/theme.inc',
+      ),
+  );
+}
+
+/**
+ * Implementation of hook_menu().
+ * D7
+ */
+function streamingmediafield_menu() {
+  $menu['admin/config/streamingmediafield'] = array(
+      'title' => 'Streaming Media Field',
+      'page callback' => 'drupal_get_form',
+      'page arguments' => array('streamingmediafield_admin_settings_form'),
+      'access arguments' => array('administer site configuration'),
+      'file' => 'includes/admin.inc',
+  );
+
+  return $menu;
 }
 
 /**
@@ -178,28 +200,33 @@ function streamingmediafield_content_is_empty($item, $field) {
 }
 
 /**
- * Implementation of hook_widget_info().
- * D7
- */
-function streamingmediafield_widget_info() {
-  $info = array();
-
-  $info['streaming_media'] = array(
-      'label' => t('Streaming media config'),
-      'field types' => array('streaming_media'),
-  );
-
-  return $info;
-}
-
-/**
- * Implementation of hook_widget()
+ * Implementation of hook_field_widget_form()
+ * D7 ... in progress
  */
 function streamingmediafield_widget_form(&$form, &$form_state, $field, $instance, $langcode, $items, $delta, $element) {
-  $stream_type = ($field['widget']['stream_type']) ? $field['widget']['stream_type'] : 'choose';
-  $progressive_download_default = ($field['widget']['progressive_download_default']) ? $field['widget']['progressive_download_default'] : FALSE;
+  $stream_type = isset($items[$delta]['stream_type']) ? $items[$delta]['stream_type'] : 'choose';
+  $progressive_download_default = isset($items[$delta]['progressive_download_default']) ? $items[$delta]['progressive_download_default'] : FALSE;
 
-  $element = array('#tree' => TRUE, '#type' => 'fieldset', '#title' => $field['widget']['label'], '#description' => $field['widget']['description'], '#collapsible' => $field['widget']['collapsible']);
+  $element += array(
+      '#delta' => $delta,
+  );
+  
+  dpm(array(
+      'field' => $field,
+      'instance' => $instance,
+      'langcode' => $langcode,
+      'items' => $items,
+      'delta' => $delta,
+      'element' => $element,
+  ));
+
+  $element = array(
+      '#tree' => TRUE,
+      '#type' => 'fieldset',
+      //'#title' => $field['widget']['label'],
+      //'#description' => $field['widget']['description'],
+      //'#collapsible' => $field['widget']['collapsible'],
+  );
 
   if ($stream_type == 'choose') {
     $element['is_live'] = array(
