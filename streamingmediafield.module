@@ -109,38 +109,26 @@ function streamingmediafield_field_widget_info() {
  */
 function streamingmediafield_field_widget_form(&$form, &$form_state, $field, $instance, $langcode, $items, $delta, $element) {
   $stream_type_chooser = $instance['widget']['settings']['stream_type'];
-  
+
   if (isset($items[$delta])) {
-    $stream_type = $items[$delta]['stream_type'];
-    $progressive_download_default = ($form['nid']['#value']) ? $items[$delta]['progressive_download_default'] : FALSE;
+    $progressive_download_default = ($form['nid']['#value']) ? $items[$delta]['progressive_download'] : FALSE;
     $is_live = $items[$delta]['is_live'];
     $stream_path = $items[$delta]['stream_path'];
     $stream_name = $items[$delta]['stream_name'];
   }
   else {
-    $stream_type = 'choose';
-    $progressive_download_default = FALSE;
+    $progressive_download_default = (isset($instance['widget']['settings']['progressive_download_default'])) ? $instance['widget']['settings']['progressive_download_default'] : FALSE;
     $is_live = 0;
     $stream_path = '';
     $stream_name = '';
   }
-  
-  
-  
+
   $element += array(
       '#delta' => $delta,
+      '#type' => 'fieldset',
   );
   $base = $element;
 
-
-  dpm(array(
-      'field' => $field,
-      'instance' => $instance,
-      'langcode' => $langcode,
-      'items' => $items,
-      'delta' => $delta,
-      'element' => $element,
-  ));
 
   if ($stream_type_chooser == 'choose') {
     $element['is_live'] = array(
@@ -152,10 +140,11 @@ function streamingmediafield_field_widget_form(&$form, &$form_state, $field, $in
         ),
         '#description' => t('A live stream plays from a live video feed on the server. An on demand stream is stored on the server and can be played any time.'),
         '#default_value' => $is_live,
-    ) + $base;
+        '#weight' => 0,
+            ) + $base;
   }
   else {
-    $element['is_live'] = array('#type' => 'hidden', '#value' => ($stream_type == 'live') ? 1 : 0) + $base;
+    $element['is_live'] = array('#type' => 'hidden', '#value' => ($stream_type_chooser == 'live') ? 1 : 0) + $base;
   }
 
   if ($stream_type_chooser == 'choose' || $stream_type_chooser == 'ondemand') {
@@ -164,25 +153,25 @@ function streamingmediafield_field_widget_form(&$form, &$form_state, $field, $in
         '#title' => t('Stream Path'),
         '#description' => t('The directory on the streaming server where this stream can be found'),
         '#default_value' => $stream_path,
-    ) + $base;
+        '#weight' => 1,
+            ) + $base;
     $element['progressive_download'] = array(
         '#type' => 'checkbox',
         '#title' => t('Use progressive download instead of streaming'),
         '#description' => t('If checked, the player will use progressive download technology rather than streaming.'),
-        '#default_value' => $progressive_download_default,
-    ) + $base;
-
+        '#default_value' => (bool) $progressive_download_default,
+        '#weight' => 5,
+            ) + $base;
+    
     if (module_exists('ctools')) {
-      $field_key = sprintf('%s[%d][is_live]', $field['field_name'], $delta);
+      $field_key = sprintf('%s[%s][%d][is_live]', $field['field_name'], $langcode, $delta);
       ctools_include('dependent');
-      $element['stream_path']['#process'] = array('ctools_dependent_process');
       $element['stream_path']['#dependency'] = array('radio:' . $field_key => array(0));
-      $element['progressive_download']['#process'] = array('ctools_dependent_process');
       $element['progressive_download']['#dependency'] = array('radio:' . $field_key => array(0));
     }
   }
   else {
-     $element['progressive_download'] = array('#type' => 'value', '#value' => 0) + $base;
+    $element['progressive_download'] = array('#type' => 'value', '#value' => 0) + $base;
   }
 
   $element['stream_name'] = array(
@@ -190,10 +179,9 @@ function streamingmediafield_field_widget_form(&$form, &$form_state, $field, $in
       '#title' => t('Stream Name'),
       '#description' => t('The name of the media stream'),
       '#default_value' => $stream_name,
-  ) + $base;
-  
-  dpm($element);
-  
+      '#weight' => 3,
+          ) + $base;
+
   return $element;
 }
 
@@ -262,7 +250,6 @@ function streamingmediafield_field_settings_form($field, $instance, $has_data) {
   }
   return $form;
 }
-
 
 /* * ***************************************************** */
 
