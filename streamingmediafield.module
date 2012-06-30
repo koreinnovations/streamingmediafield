@@ -19,10 +19,10 @@ function streamingmediafield_field_info() {
  */
 function streamingmediafield_field_schema() {
   $columns = array();
-  $columns['stream_name'] = array('type' => 'varchar', 'length' => 255, 'not null' => TRUE);
+  $columns['stream_name'] = array('type' => 'varchar', 'length' => 255, 'not null' => TRUE, 'default' => '');
   $columns['stream_path'] = array('type' => 'varchar', 'length' => 255, 'not null' => FALSE);
-  $columns['is_live'] = array('type' => 'int', 'size' => 'tiny', 'not null' => TRUE);
-  $columns['progressive_download'] = array('type' => 'int', 'size' => 'tiny', 'not null' => TRUE);
+  $columns['is_live'] = array('type' => 'int', 'size' => 'tiny', 'not null' => TRUE, 'default' => 0);
+  $columns['progressive_download'] = array('type' => 'int', 'size' => 'tiny', 'not null' => TRUE, 'default' => 0);
 
   $indexes = array();
   $indexes['stream_name'] = array('stream_name');
