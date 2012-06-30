@@ -162,7 +162,7 @@ function streamingmediafield_field_widget_form(&$form, &$form_state, $field, $in
         '#default_value' => (bool) $progressive_download_default,
         '#weight' => 5,
             ) + $base;
-    
+
     if (module_exists('ctools')) {
       $field_key = sprintf('%s[%s][%d][is_live]', $field['field_name'], $langcode, $delta);
       ctools_include('dependent');
@@ -253,62 +253,29 @@ function streamingmediafield_field_settings_form($field, $instance, $has_data) {
 
 /* * ***************************************************** */
 
-
-
-
-
-/*
- * Implementation of hook_theme().
- * D7
- */
-
-function streamingmediafield_theme() {
-  return array(
-      'streaming_media' => array(
-          'variables' => array('element' => NULL),
-          'file' => 'includes/theme.inc',
-      ),
-      'streamingmediafield_formatter_default' => array(
-          'variables' => array('element' => NULL),
-          'file' => 'includes/theme.inc',
-      ),
-  );
-}
-
 /**
  * Implementation of hook_menu().
- * D7
  */
 function streamingmediafield_menu() {
-  $menu['admin/config/streamingmediafield'] = array(
+  $items = array();
+
+  $items['admin/config/streamingmediafield'] = array(
       'title' => 'Streaming Media Field',
+      'position' => 'right',
+      'weight' => -5,
+      'page callback' => 'system_admin_menu_block_page',
+      'access arguments' => array('administer site configuration'),
+      'file' => 'system.admin.inc',
+      'file path' => drupal_get_path('module', 'system'),
+  );
+
+  $items['admin/config/streamingmediafield/settings'] = array(
+      'title' => 'Global Settings',
       'page callback' => 'drupal_get_form',
       'page arguments' => array('streamingmediafield_admin_settings_form'),
       'access arguments' => array('administer site configuration'),
       'file' => 'includes/admin.inc',
   );
 
-  return $menu;
-}
-
-/**
- * Generate a default value for streaming media fields.
- */
-function streamingmediafield_default_value(&$form, &$form_state, $field, $delta = 0) {
-  $default_value = array();
-
-  $default_value['is_live'] = 0;
-  $default_value['progressive_download'] = 0;
-  $default_value['stream_name'] = '';
-  $default_value['stream_path'] = '';
-
-  return array($default_value);
-}
-
-/**
- * Implementation of hook_content_is_empty().
- * D7
- */
-function streamingmediafield_content_is_empty($item, $field) {
-  return empty($item['stream_name']);
+  return $items;
 }

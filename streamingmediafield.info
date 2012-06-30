@@ -1,3 +1,4 @@
 name = Streaming Media Field
 description = Creates a Streaming Media field type used for live or on-demand streaming
 core = 7.x
+configure=admin/config/streamingmediafield/settings
