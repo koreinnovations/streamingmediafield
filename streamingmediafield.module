@@ -38,15 +38,14 @@ function streamingmediafield_field_schema() {
  * D7
  */
 function streamingmediafield_field_validate($entity_type, $entity, $field, $instance, $langcode, $items, &$errors) {
-  foreach ($items as $delta => $item) {
-    dpm($item);
-    if (empty($item['stream_name'])) {
-      $errors[$field['field_name']][$langcode][$delta][] = array(
-          'error' => 'stream_name_missing',
-          'message' => t('Please fill in the stream name.'),
-      );
-    }
-  }
+  //foreach ($items as $delta => $item) {
+    //if (empty($item['stream_name'])) {
+    //  $errors[$field['field_name']][$langcode][$delta][] = array(
+    //      'error' => 'stream_name_missing',
+    //      'message' => t('Please fill in the stream name.'),
+    //  );
+    //}
+  //}
 }
 
 /**
