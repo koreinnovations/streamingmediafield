@@ -151,6 +151,10 @@ function streamingmediafield_widget(&$form, &$form_state, $field, $items, $delta
       $element['progressive_download']['#dependency'] = array('radio:' . $field_key => array(0));
     }
   }
+  else {
+    // progressive download should always be FALSE for live streams
+    $element['progressive_download'] = array('#type' => 'hidden', '#value' => 0);
+  }
 
   $element['stream_name'] = array(
       '#type' => 'textfield',
